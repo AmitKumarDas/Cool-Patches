@@ -1,0 +1,122 @@
+Index: client/WEB-INF/classes/resources/messages.properties
+===================================================================
+--- client/WEB-INF/classes/resources/messages.properties	(revision 7172)
++++ client/WEB-INF/classes/resources/messages.properties	(working copy)
+@@ -428,7 +428,9 @@
+ label.usedstorage=Used Storage
+ label.latency=Latency (ms)
+ label.throughput=Throughput
++label.backupthroughput=Backup Throughput
+ label.iops=IOPS
++label.backupiops=Backup IOPS
+ label.groupname=QoS Group
+ label.throttle=Throttle
+ label.quota=Quota (GB)
+Index: ui2/include/dictionary.jsp
+===================================================================
+--- ui2/include/dictionary.jsp	(revision 7172)
++++ ui2/include/dictionary.jsp	(working copy)
+@@ -425,7 +425,9 @@
+ 'label.usedstorage': '<fmt:message key="label.usedstorage"/>',
+ 'label.latency':  '<fmt:message key="label.latency"/>',
+ 'label.throughput':  '<fmt:message key="label.throughput" />',
++'label.backupthroughput':  '<fmt:message key="label.backupthroughput" />',
+ 'label.iops':  '<fmt:message key="label.iops"/>',
++'label.backupiops':  '<fmt:message key="label.backupiops"/>',
+ 'label.groupname':  '<fmt:message key="label.groupname"/>',
+ 'label.throttle':  '<fmt:message key="label.throttle" />',
+ 'label.quota':  '<fmt:message key="label.quota" />',
+Index: ui2/scripts/tsmRemoteMirrorWizard.js
+===================================================================
+--- ui2/scripts/tsmRemoteMirrorWizard.js	(revision 7172)
++++ ui2/scripts/tsmRemoteMirrorWizard.js	(working copy)
+@@ -105,11 +105,51 @@
+ 						descriptions: ['Specify backup network IP address for the remote pool','Specify backup network subnet for the remote pool'],
+ 						validation: { required: true, ipaddress : true }
+ 					},
+-      		schedule : {
+-      			label: 'label.schedule', 
+-      			validation: { required: true },
+-      			desc: 'Specify a schedule for the DR VSM'
+-      		}
++          backupiops: {
++            label: 'label.backupiops',
++            isSlider :true,
++            fieldNames : ['iopsSlider','iopsValue'],
++            desc: 'message.tooltip.tsm.iopsValue',
++            sliderArgs : function(args) {
++              var maxVal = 0;
++              var defaultVal;
++			  var array1 = [];
++			  array1.push("&id=" + todb(cloudStack.tsmRemoteMirrorWizard.tsmObj.poolid));
++              $.ajax({
++				  url: createURL("listHAPool" + array1.join("")),
++				  dataType: "json",
++				  async: false,
++				  success: function(json) {
++					  //resp
++					  maxVal = json.listHAPoolResponse.hapool[0].availIOPS;
++				  }
++              })
++              
++              if(maxVal>1000)
++                defaultVal = 1000;
++              else if(maxVal>100 && maxVal<=1000)
++                defaultVal = 100;
++              else 
++                defaultVal = 0;
++              var minVal = isUncontrolledIopsAllowed() ? 0 : 1;
++              if(maxVal<minVal && !isUncontrolledIopsAllowed()){
++                // min iops should be 1, will check on click of next
++                return {min: 0, max: maxVal, defaultVal:defaultVal};
++             }
++              return {min: minVal, max: maxVal, defaultVal:defaultVal};
++            },
++            validation : { required: true, number: true, min: function(){ return isUncontrolledIopsAllowed() ? 0 : 1 } }
++          },
++          totalthroughput : {
++			  label: 'label.backupupthroughput',
++			  desc: 'message.tooltip.tsm.tpValue',
++			  defaultValue: 'Uncontrolled'
++		  },
++  		schedule : {
++    		label: 'label.schedule', 
++      		validation: { required: true },
++      		desc: 'Specify a schedule for the DR VSM'
++   		}
+ 
+       	}
+       }
+Index: ui2/scripts/ui-custom/tsmRemoteMirrorWizard.js
+===================================================================
+--- ui2/scripts/ui-custom/tsmRemoteMirrorWizard.js	(revision 7172)
++++ ui2/scripts/ui-custom/tsmRemoteMirrorWizard.js	(working copy)
+@@ -922,6 +922,28 @@
+             	            	
+         	} else if(formID == "scheduler"){
+         		
++       	     $iopsValue = $wizard.find('input#iopsValue');
++             $iopsSlider = $wizard.find('div.iopsSlider');
++             $throughPutValue = $wizard.find('input#totalthroughput');
++            
++    		// ThroughPut value with respect to IOPS vale
++    		var throughPutValue = function(){
++              var blocksizeVal = 4;
++        	  var throughput = (blocksizeVal * 8 * $iopsValue.val());
++              $throughPutValue.val(throughput==0?'Uncontrolled':throughput);
++            }
++    		
++            // Disabled the throughput field in the form
++            $throughPutValue.attr({
++          	  class : 'nonEditableField',
++          	  disabled :'disabled'
++            });
++            throughPutValue();
++            $throughPutSlider = $wizard.find('div.tpSlider');
++            $iopsValue.keyup(function(event){
++          	throughPutValue();
++            });
++        		
+             	var $scheduler = $wizard.find('div.select-container .field[rel=schedule]');
+ 	            var $poolid = formState.poolid;
+             	if ($scheduler.find('div input').size()) {
