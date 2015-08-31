@@ -1,0 +1,41 @@
+Index: bkp.c
+===================================================================
+--- bkp.c	(revision 1909)
++++ bkp.c	(working copy)
+@@ -666,7 +666,7 @@
+  				error= create_dst_reten_snaplist(bkpcb,nv);
+                       }
+                }	
+-
++		pclose(fp);
+  		/* Accounting total bytes to be transferred to show in the progress 
+   		 * Calculate the total bytes by sumof(incremental snapshot of all the dataset(parent and children))*/
+  		sprintf(bkpcb->bkp_zfs_cmd,"zfs list -o name -s name -t snapshot | grep %s",strchr(bkpcb->bkp_incr_snap.name, '@'));
+@@ -1062,7 +1062,8 @@
+ 						strlcpy(buf,incr_buf,strlen(incr_buf));
+ 						snap_guid = get_guid(buf);
+ 					}
+-				}else{
++					 pclose(fp);
++		       		}else{
+ 					sprintf(zfs_cmd,"zfs list -o name -t snapshot -s creation| grep %s | grep -v %s/",dsetname, dsetname);
+ 					pjdlog_debug(1," %s\n",zfs_cmd);
+         	       			fp = popen(zfs_cmd, "r");
+@@ -1080,7 +1081,8 @@
+ 							}
+ 						}
+ 					}
+-					if(snap_guid == -1)
++					pclose(fp);
++                                        if(snap_guid == -1)
+ 					goto fail;
+ 	
+ 				}
+@@ -1786,6 +1788,7 @@
+ 		nv_add_string(nv, snapname, reten_snapid);
+ 	}
+ 
++        pclose(fp);
+ 	nv_add_int32(nv, no_reten_snaps, "no_remote_reten_snaps");
+ 	nv_add_int32(nv, bkpcb->bkp_remote_reten, "no_remote_reten_bkpsnaps");
+ 	free(buf);
