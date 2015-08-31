@@ -1,0 +1,2334 @@
+Index: api/src/com/cloud/api/BaseCmd.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloud/api/BaseCmd.java b/branches/es1.4.0.p5/api/src/com/cloud/api/BaseCmd.java
+--- a/branches/es1.4.0.p5/api/src/com/cloud/api/BaseCmd.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloud/api/BaseCmd.java	(working copy)
+@@ -40,6 +40,7 @@
+ import com.cloud.utils.Pair;
+ import com.cloud.utils.component.ComponentLocator;
+ import com.cloud.utils.qal.ListenerService;
++import com.cloudbyte.managers.DRService;
+ import com.cloudbyte.managers.LdapService;
+ import com.cloudbyte.managers.MigrationService;
+ import com.cloudbyte.managers.PoolService;
+@@ -112,6 +113,7 @@
+     public static VolumeService _volumeService;
+     public static QosGroupService _qosGroupManagerService; 
+     public static BackupService _backupManagerService;
++    public static DRService _drManagerService;
+   //TODO move this to cloudbyte base command
+     public static CloudByteResourceService _cloudByteResourceService;
+     public static ReportService _reportService;
+@@ -144,7 +146,7 @@
+         _backupManagerService = locator.getManager(BackupService.class);
+         _migrationService = locator.getManager(MigrationService.class);
+         _ldapService = locator.getManager(LdapService.class);
+-        _migrationService = locator.getManager(MigrationService.class);
++        _drManagerService = locator.getManager(DRService.class);
+     }
+ 
+     public abstract void execute() throws ResourceUnavailableException, InsufficientCapacityException, ServerApiException, ConcurrentOperationException, ResourceAllocationException, NetworkRuleConflictException;
+Index: api/src/com/cloudbyte/api/beans/DataProtectionBean.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java	(working copy)
+@@ -0,0 +1,258 @@
++package com.cloudbyte.api.beans;
++
++public class DataProtectionBean implements EntityBean {
++
++	private String errMsg;
++	private String moduleVersion;
++	private long fromVSMId;
++	private long fromDatasetId;
++	private long fromPoolId;
++	private long fromControllerId;
++	private long toVSMId;
++	private long toDatasetId;
++	private long toPoolId;
++	private long toControllerId;
++	private long backupMgmtId;
++	private long retentionCopies;
++	private String schedulerName;
++	private String schedulerType;
++	private String schedulerPassword;
++	private String schedulerUsername;
++	private String monthOfScheduler;
++	private String weekOfScheduler;
++	private String dayOfScheduler;
++	private String hourOfScheduler;
++	private String minuteOfScheduler;
++	private String schedulerStatus;
++	private long backupQoSGroupId;
++	private String backupQosGroupName;
++	private long schedulerId;
++
++	@Override
++	public String getErrMsg() {
++		return errMsg;
++	}
++
++	@Override
++	public void errMsg(String errMsg) {
++		this.errMsg = errMsg;
++	}
++
++	@Override
++	public String getModuleVersion() {
++		return moduleVersion;
++	}
++
++	@Override
++	public void moduleVersion(String moduleVersion) {
++		this.moduleVersion = moduleVersion;
++	}
++
++	public long getFromVSMId() {
++		return fromVSMId;
++	}
++
++	public DataProtectionBean fromVSMId(long fromVSMId){
++		this.fromVSMId = fromVSMId;
++		return this;
++	}
++
++	public long getFromDatasetId() {
++		return fromDatasetId;
++	}
++	
++	public DataProtectionBean fromDatasetId(long fromDatasetId){
++		this.fromDatasetId = fromDatasetId;
++		return this;
++	}
++
++	public long getFromPoolId() {
++		return fromPoolId;
++	}
++	
++	public DataProtectionBean fromPoolId(long fromPoolId){
++		this.fromPoolId = fromPoolId;
++		return this;
++	}
++
++	public long getFromControllerId() {
++		return fromControllerId;
++	}
++	
++	public DataProtectionBean fromControllerId(long fromControllerId){
++		this.fromControllerId = fromControllerId;
++		return this;
++	}
++
++	public long getToVSMId() {
++		return toVSMId;
++	}
++	
++	public DataProtectionBean toVSMId(long toVSMId){
++		this.toVSMId = toVSMId;
++		return this;
++	}
++
++	public long getToDatasetId() {
++		return toDatasetId;
++	}
++	
++	public DataProtectionBean toDatasetId(long toDatasetId){
++		this.toDatasetId = toDatasetId;
++		return this;
++	}
++
++	public long getToPoolId() {
++		return toPoolId;
++	}
++	
++	public DataProtectionBean toPoolId(long toPoolId){
++		this.toPoolId = toPoolId;
++		return this;
++	}
++
++	public long getToControllerId() {
++		return toControllerId;
++	}
++	
++	public DataProtectionBean toControllerId(long toControllerId){
++		this.toControllerId = toControllerId;
++		return this;
++	}
++
++	public long getBackupMgmtId() {
++		return backupMgmtId;
++	}
++	
++	public DataProtectionBean backupMgmtId(long backupMgmtId){
++		this.backupMgmtId = backupMgmtId;
++		return this;
++	}
++
++	public long getRetentionCopies() {
++		return retentionCopies;
++	}
++	
++	public DataProtectionBean retentionCopies(long retentionCopies){
++		this.retentionCopies = retentionCopies;
++		return this;
++	}
++
++	public String getSchedulerName() {
++		return schedulerName;
++	}
++	
++	public DataProtectionBean schedulerName(String schedulerName){
++		this.schedulerName = schedulerName;
++		return this;		
++	}
++
++	public String getSchedulerType() {
++		return schedulerType;
++	}
++	
++	public DataProtectionBean schedulerType(String schedulerType){
++		this.schedulerType = schedulerType;
++		return this;
++	}
++
++	public String getSchedulerPassword() {
++		return schedulerPassword;
++	}
++	
++	public DataProtectionBean schedulerPassword(String schedulerPassword){
++		this.schedulerPassword = schedulerPassword;
++		return this;
++	}
++
++	public String getSchedulerUsername() {
++		return schedulerUsername;
++	}
++	
++	public DataProtectionBean schedulerUsername(String schedulerUsername){
++		this.schedulerUsername = schedulerUsername;
++		return this;
++	}
++
++	public String getMonthOfScheduler() {
++		return monthOfScheduler;
++	}
++	
++	public DataProtectionBean monthOfScheduler(String monthOfScheduler){
++		this.monthOfScheduler = monthOfScheduler;
++		return this;
++	}
++
++	public String getWeekOfScheduler() {
++		return weekOfScheduler;
++	}
++
++	public DataProtectionBean weekOfScheduler(String weekOfScheduler){
++		this.weekOfScheduler = weekOfScheduler;
++		return this;
++	}
++	
++	public String getDayOfScheduler() {
++		return dayOfScheduler;
++	}
++	
++	public DataProtectionBean dayOfScheduler(String dayOfScheduler){
++		this.dayOfScheduler = dayOfScheduler;
++		return this;		
++	}
++
++	public String getHourOfScheduler() {
++		return hourOfScheduler;
++	}
++	
++	public DataProtectionBean hourOfScheduler(String hourOfScheduler){
++		this.hourOfScheduler = hourOfScheduler;
++		return this;
++	}
++
++	public String getMinuteOfScheduler() {
++		return minuteOfScheduler;
++	}
++
++	public DataProtectionBean minuteOfScheduler(String minuteOfScheduler){
++		this.minuteOfScheduler = minuteOfScheduler;
++		return this;
++	}
++	
++	public String getSchedulerStatus() {
++		return schedulerStatus;
++	}
++	
++	public DataProtectionBean schedulerStatus(String schedulerStatus){
++		this.schedulerStatus = schedulerStatus;
++		return this;
++	}
++
++	public long getBackupQosGroupId() {
++		return backupQoSGroupId;
++	}
++	
++	public DataProtectionBean backupQoSGroupId(long backupQoSGroupId){
++		this.backupQoSGroupId = backupQoSGroupId;
++		return this;
++	}
++
++	public String getBackupQosGroupName() {
++		return backupQosGroupName;
++	}
++	
++	public DataProtectionBean backupQosGroupName(String backupQosGroupName){
++		this.backupQosGroupName = backupQosGroupName;
++		return this;
++	}
++	
++	public long getSchedulerId(){
++		return schedulerId;
++	}
++	
++	public DataProtectionBean schedulerId(long schedulerId){
++		this.schedulerId = schedulerId;
++		return this;
++	}
++	
++}
+Index: api/src/com/cloudbyte/api/beans/EntityBean.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java	(working copy)
+@@ -0,0 +1,39 @@
++package com.cloudbyte.api.beans;
++
++/**
++ * EntityBean is not the same as VO. In other words it is not a ORM entity of
++ * ElastiCenter DB. This is a plain getter setter mostly built out of http
++ * client's input parameters. This class will be used to pass between CMD
++ * classes, StorageServiceMgrImpl class & down to individual ServiceMgrImpl
++ * classes.
++ * 
++ * The StorageServiceMgrImpl will have template methods that will make use of
++ * this EntityBean. It is also expected that this EntityBean will be enhanced by
++ * setting some of the properties while returning from an individual
++ * ServiceMgrImpl method execution.
++ * 
++ * @author amit.das
++ * 
++ */
++public interface EntityBean {
++
++    /*
++     * This is useful for passing error messages from called classes to caller.
++     * This is efficient than using throw new Exception(message);
++     */
++    String getErrMsg();
++
++    void errMsg(String errMsg);
++    
++    /*
++     * This is useful to log module name & its specific version.
++     * This can also be used to pass the module name & version to Controller.
++     * This is very helpful to grep for module specific logs.
++     * This is also useful to learn the module specific version from the logs.
++     * This will be set at CMD classes.
++     */
++    String getModuleVersion();
++    
++    void moduleVersion(String moduleVersion);
++
++}
+Index: api/src/com/cloudbyte/api/beans/DataProtectionBean.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/DataProtectionBean.java	(working copy)
+@@ -0,0 +1,258 @@
++package com.cloudbyte.api.beans;
++
++public class DataProtectionBean implements EntityBean {
++
++	private String errMsg;
++	private String moduleVersion;
++	private long fromVSMId;
++	private long fromDatasetId;
++	private long fromPoolId;
++	private long fromControllerId;
++	private long toVSMId;
++	private long toDatasetId;
++	private long toPoolId;
++	private long toControllerId;
++	private long backupMgmtId;
++	private long retentionCopies;
++	private String schedulerName;
++	private String schedulerType;
++	private String schedulerPassword;
++	private String schedulerUsername;
++	private String monthOfScheduler;
++	private String weekOfScheduler;
++	private String dayOfScheduler;
++	private String hourOfScheduler;
++	private String minuteOfScheduler;
++	private String schedulerStatus;
++	private long backupQoSGroupId;
++	private String backupQosGroupName;
++	private long schedulerId;
++
++	@Override
++	public String getErrMsg() {
++		return errMsg;
++	}
++
++	@Override
++	public void errMsg(String errMsg) {
++		this.errMsg = errMsg;
++	}
++
++	@Override
++	public String getModuleVersion() {
++		return moduleVersion;
++	}
++
++	@Override
++	public void moduleVersion(String moduleVersion) {
++		this.moduleVersion = moduleVersion;
++	}
++
++	public long getFromVSMId() {
++		return fromVSMId;
++	}
++
++	public DataProtectionBean fromVSMId(long fromVSMId){
++		this.fromVSMId = fromVSMId;
++		return this;
++	}
++
++	public long getFromDatasetId() {
++		return fromDatasetId;
++	}
++	
++	public DataProtectionBean fromDatasetId(long fromDatasetId){
++		this.fromDatasetId = fromDatasetId;
++		return this;
++	}
++
++	public long getFromPoolId() {
++		return fromPoolId;
++	}
++	
++	public DataProtectionBean fromPoolId(long fromPoolId){
++		this.fromPoolId = fromPoolId;
++		return this;
++	}
++
++	public long getFromControllerId() {
++		return fromControllerId;
++	}
++	
++	public DataProtectionBean fromControllerId(long fromControllerId){
++		this.fromControllerId = fromControllerId;
++		return this;
++	}
++
++	public long getToVSMId() {
++		return toVSMId;
++	}
++	
++	public DataProtectionBean toVSMId(long toVSMId){
++		this.toVSMId = toVSMId;
++		return this;
++	}
++
++	public long getToDatasetId() {
++		return toDatasetId;
++	}
++	
++	public DataProtectionBean toDatasetId(long toDatasetId){
++		this.toDatasetId = toDatasetId;
++		return this;
++	}
++
++	public long getToPoolId() {
++		return toPoolId;
++	}
++	
++	public DataProtectionBean toPoolId(long toPoolId){
++		this.toPoolId = toPoolId;
++		return this;
++	}
++
++	public long getToControllerId() {
++		return toControllerId;
++	}
++	
++	public DataProtectionBean toControllerId(long toControllerId){
++		this.toControllerId = toControllerId;
++		return this;
++	}
++
++	public long getBackupMgmtId() {
++		return backupMgmtId;
++	}
++	
++	public DataProtectionBean backupMgmtId(long backupMgmtId){
++		this.backupMgmtId = backupMgmtId;
++		return this;
++	}
++
++	public long getRetentionCopies() {
++		return retentionCopies;
++	}
++	
++	public DataProtectionBean retentionCopies(long retentionCopies){
++		this.retentionCopies = retentionCopies;
++		return this;
++	}
++
++	public String getSchedulerName() {
++		return schedulerName;
++	}
++	
++	public DataProtectionBean schedulerName(String schedulerName){
++		this.schedulerName = schedulerName;
++		return this;		
++	}
++
++	public String getSchedulerType() {
++		return schedulerType;
++	}
++	
++	public DataProtectionBean schedulerType(String schedulerType){
++		this.schedulerType = schedulerType;
++		return this;
++	}
++
++	public String getSchedulerPassword() {
++		return schedulerPassword;
++	}
++	
++	public DataProtectionBean schedulerPassword(String schedulerPassword){
++		this.schedulerPassword = schedulerPassword;
++		return this;
++	}
++
++	public String getSchedulerUsername() {
++		return schedulerUsername;
++	}
++	
++	public DataProtectionBean schedulerUsername(String schedulerUsername){
++		this.schedulerUsername = schedulerUsername;
++		return this;
++	}
++
++	public String getMonthOfScheduler() {
++		return monthOfScheduler;
++	}
++	
++	public DataProtectionBean monthOfScheduler(String monthOfScheduler){
++		this.monthOfScheduler = monthOfScheduler;
++		return this;
++	}
++
++	public String getWeekOfScheduler() {
++		return weekOfScheduler;
++	}
++
++	public DataProtectionBean weekOfScheduler(String weekOfScheduler){
++		this.weekOfScheduler = weekOfScheduler;
++		return this;
++	}
++	
++	public String getDayOfScheduler() {
++		return dayOfScheduler;
++	}
++	
++	public DataProtectionBean dayOfScheduler(String dayOfScheduler){
++		this.dayOfScheduler = dayOfScheduler;
++		return this;		
++	}
++
++	public String getHourOfScheduler() {
++		return hourOfScheduler;
++	}
++	
++	public DataProtectionBean hourOfScheduler(String hourOfScheduler){
++		this.hourOfScheduler = hourOfScheduler;
++		return this;
++	}
++
++	public String getMinuteOfScheduler() {
++		return minuteOfScheduler;
++	}
++
++	public DataProtectionBean minuteOfScheduler(String minuteOfScheduler){
++		this.minuteOfScheduler = minuteOfScheduler;
++		return this;
++	}
++	
++	public String getSchedulerStatus() {
++		return schedulerStatus;
++	}
++	
++	public DataProtectionBean schedulerStatus(String schedulerStatus){
++		this.schedulerStatus = schedulerStatus;
++		return this;
++	}
++
++	public long getBackupQosGroupId() {
++		return backupQoSGroupId;
++	}
++	
++	public DataProtectionBean backupQoSGroupId(long backupQoSGroupId){
++		this.backupQoSGroupId = backupQoSGroupId;
++		return this;
++	}
++
++	public String getBackupQosGroupName() {
++		return backupQosGroupName;
++	}
++	
++	public DataProtectionBean backupQosGroupName(String backupQosGroupName){
++		this.backupQosGroupName = backupQosGroupName;
++		return this;
++	}
++	
++	public long getSchedulerId(){
++		return schedulerId;
++	}
++	
++	public DataProtectionBean schedulerId(long schedulerId){
++		this.schedulerId = schedulerId;
++		return this;
++	}
++	
++}
+Index: api/src/com/cloudbyte/api/beans/EntityBean.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/beans/EntityBean.java	(working copy)
+@@ -0,0 +1,39 @@
++package com.cloudbyte.api.beans;
++
++/**
++ * EntityBean is not the same as VO. In other words it is not a ORM entity of
++ * ElastiCenter DB. This is a plain getter setter mostly built out of http
++ * client's input parameters. This class will be used to pass between CMD
++ * classes, StorageServiceMgrImpl class & down to individual ServiceMgrImpl
++ * classes.
++ * 
++ * The StorageServiceMgrImpl will have template methods that will make use of
++ * this EntityBean. It is also expected that this EntityBean will be enhanced by
++ * setting some of the properties while returning from an individual
++ * ServiceMgrImpl method execution.
++ * 
++ * @author amit.das
++ * 
++ */
++public interface EntityBean {
++
++    /*
++     * This is useful for passing error messages from called classes to caller.
++     * This is efficient than using throw new Exception(message);
++     */
++    String getErrMsg();
++
++    void errMsg(String errMsg);
++    
++    /*
++     * This is useful to log module name & its specific version.
++     * This can also be used to pass the module name & version to Controller.
++     * This is very helpful to grep for module specific logs.
++     * This is also useful to learn the module specific version from the logs.
++     * This will be set at CMD classes.
++     */
++    String getModuleVersion();
++    
++    void moduleVersion(String moduleVersion);
++
++}
+Index: api/src/com/cloudbyte/api/CloudByteApiConstants.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/CloudByteApiConstants.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/CloudByteApiConstants.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/CloudByteApiConstants.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/CloudByteApiConstants.java	(working copy)
+@@ -130,6 +130,8 @@
+ 	public static final String COMPRESSION = "compression";
+ 	public static final String SYNC = "sync";
+ 	public static final String RECORD_SIZE = "recordsize";
++	public static final String QOSGROUP_NAME = "qosgroupname";
++	public static final String QOSGROUP_TYPE = "qosgrouptype";
+ 	public static final String QOSGROUP_ID = "qosgroupid";
+ 	public static final String BACKUP_QOSGROUP_ID = "backupqosgroupid";
+ 	public static final String NUMBER_OF_COPIES = "noofcopies";
+Index: api/src/com/cloudbyte/api/commands/AddQosGroupCmd.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddQosGroupCmd.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddQosGroupCmd.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddQosGroupCmd.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddQosGroupCmd.java	(working copy)
+@@ -53,11 +53,12 @@
+ 
+ 	@Parameter(name = CloudByteApiConstants.TYPE, type = CommandType.STRING, required = false, description = "Type of the QoS_Group")
+ 	private String type;
++	
+ 	@Parameter(name = CloudByteApiConstants.GRACE, type = CommandType.BOOLEAN, required = false, description = "Grace allowed for Qos_group")
+ 	private boolean graceAllowed;
+ 
+-	@Parameter(name = CloudByteApiConstants.DATASET_ID, type = CommandType.STRING, required = false, description = "Paranet Dataset ID for the file system")
+-	private String parantDatasetId;
++	@Parameter(name = CloudByteApiConstants.DATASET_ID, type = CommandType.STRING, required = false, description = "Parent Dataset ID for the file system")
++	private String parentDatasetId;
+ 
+ 	// ////////////////////////////////////////////////////
+ 	// ////////////////Accessors/////////////////////////
+@@ -114,7 +115,7 @@
+ 	}
+ 
+ 	public String getParantDatasetId() {
+-		return parantDatasetId;
++		return parentDatasetId;
+ 	}
+ 
+ 	// ///////////////////////////////////////////////////
+Index: api/src/com/cloudbyte/api/commands/AddRemoteScheduleCmd.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddRemoteScheduleCmd.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddRemoteScheduleCmd.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddRemoteScheduleCmd.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/AddRemoteScheduleCmd.java	(working copy)
+@@ -9,8 +9,12 @@
+ import com.cloud.user.DelegatedAdminType;
+ import com.cloud.user.UserContext;
+ import com.cloudbyte.api.CloudByteApiConstants;
++import com.cloudbyte.api.beans.DataProtectionBean;
++import com.cloudbyte.api.beans.QoSGroupBean;
+ import com.cloudbyte.api.response.RemoteScheduleResponse;
+ import com.cloudbyte.dpscheduler.DPScheduler;
++import com.cloudbyte.managers.QosGroupService;
++import com.cloudbyte.tsm.QosGroup;
+ 
+ import org.apache.log4j.Logger;
+ 
+@@ -91,15 +95,124 @@
+     @Parameter(name=CloudByteApiConstants.TYPE, type=CommandType.STRING, required=false, description="type of the scheduler")
+     private String type;
+     
+-	@IdentityMapper(entityTableName="cb_qos_group")
+-	@Parameter(name=CloudByteApiConstants.BACKUP_QOSGROUP_ID, type=CommandType.LONG, required=false, description="Backup QosGroup ID for the volumes. Backup QOS will be shared across volumes of the source VSM.")
+-    private Long backupQosGroupId;
+ 
++	// ///////////////////////////////////////////////////
++	// /////////// API parameters for Backup QoS Group////
++	// ///////////////////////////////////////////////////
++    
++    /*
++     * If backupQosGroupId is provided, else create a new BackupQoSGroup
++     */
++	/*@IdentityMapper(entityTableName = "cb_qos_group")
++	@Parameter(name = CloudByteApiConstants.BACKUP_QOSGROUP_ID, type = CommandType.LONG, required = false, 
++		description = "Backup QosGroup ID for the volumes. Backup QOS will be shared across volumes of the source VSM.")
++	private Long backupQosGroupId;*/
++
++	/*@IdentityMapper(entityTableName = "cb_tsm")
++	@Parameter(name = CloudByteApiConstants.TSM_ID, type = CommandType.LONG, required = true, description = "ID of the VSM.")
++	private Long tsmId;*/
++
++	@Parameter(name = CloudByteApiConstants.THROUGHPUT_CONTROL, type = CommandType.STRING, required = false, description = "throughput control of the QoS_Group.")
++	private String tpControl;
++	
++	
++	@Parameter(name = CloudByteApiConstants.IOPS_CONTROL, type = CommandType.STRING, required = false, description = "iops control of the QoS_Group.")
++	private String iopscontrol;
++	
++	
++	@Parameter(name = CloudByteApiConstants.IOPS, type = CommandType.STRING, required = false, description = "Input/output operations of QoS_Group per second.")
++	private String iops;
++	
++	
++	@Parameter(name = CloudByteApiConstants.THROUGHPUT, type = CommandType.STRING, required = false, description = "throughput of QoS_Group per unit of time. refer, Throughput = IOPS * Blocksize")
++	private String throughput;
++	
++	
++	@Parameter(name = CloudByteApiConstants.BLOCK_SIZE, type = CommandType.STRING, required = false, description = "size of the block of data used for input or output operation for QoS, should be a power of 2")
++	private String blocksize;
++	
++
++	@Parameter(name = CloudByteApiConstants.LATENCY, type = CommandType.STRING, required = false, description = "delay between request and first response for QoS_Group")
++	private String latency;
++	
++	
++	@Parameter(name = CloudByteApiConstants.NETWORK_SPEED, type = CommandType.STRING, required = false, description = "speed of the network for QoS_Group.")
++	private String networkSpeed;
++	
++	
++	@Parameter(name = CloudByteApiConstants.MEM_LIMIT, type = CommandType.STRING, required = false, description = "memory limit for QoS_Group")
++	private String memLimit;
++	
++	
++	@Parameter(name = CloudByteApiConstants.QOSGROUP_NAME, type = CommandType.STRING, required = false, description = "name of the QoS_Group.")
++	private String qosGrpName;
++
++	
++	@Parameter(name = CloudByteApiConstants.QOSGROUP_TYPE, type = CommandType.STRING, required = false, description = "type of the QoS_Group")
++	private String qosGrpType;
++	
++	
++	@Parameter(name = CloudByteApiConstants.GRACE, type = CommandType.BOOLEAN, required = false, description = "grace allowed for Qos_group")
++	private boolean graceAllowed;
++
++	
++	@Parameter(name = CloudByteApiConstants.DATASET_ID, type = CommandType.STRING, required = false, description = "parent Dataset ID for the file system")
++	private String qosParentDatasetId;
++	
++	
++
+ 	//////////////////////////////
+ 	////////Accessors////////////
+ 	/////////////////////////////
++	public String getTpControl(){
++		return tpControl;
++	}
+ 	
+-	public String getName() {
++	public String getIopsControl(){
++		return iopscontrol;
++	}
++
++	public String getIops(){
++		return iops;
++	}
++
++	public String getThroughput(){
++		return throughput;
++	}
++
++	public String getBlocksize(){
++		return blocksize;
++	}
++
++	public String getLatency(){
++		return latency;
++	}
++
++	public String getNetworkSpeed(){
++		return networkSpeed;
++	}
++
++	public String getMemLimit(){
++		return memLimit;
++	}
++
++	public String getQosGrpName(){
++		return qosGrpName;
++	}
++	
++	public String getQosGrpType(){
++		return qosGrpType;
++	}
++	
++	public boolean getGraceAllowed(){
++		return graceAllowed;
++	}
++	
++	public String getQosParentDatasetId(){
++		return qosParentDatasetId;
++	}
++	
++	public String getDPSchedulerName() {
+ 		return name;
+ 	}
+ 	
+@@ -168,7 +281,7 @@
+ 		return status;
+ 	}
+ 	
+-	public String getType() {
++	public String getDpSchedulerType() {
+ 		return type;
+ 	}
+ 	
+@@ -186,10 +299,6 @@
+ 		return minute;
+ 	}
+ 	
+-	public Long getBackupQosGroupId() {
+-		return backupQosGroupId;
+-	}
+-
+ 	public Long getRetentionCopies()
+ 	{
+ 		if(retentioncopies == null)
+@@ -202,26 +311,96 @@
+ 	@Override
+ 	public void execute() {		
+ 		
+-		if(getType().equals("2") || getType().equalsIgnoreCase("mirror"))
++		s_logger.info("Start of AddRemoteSchedulerCMD");
++		
++		if (getDpSchedulerType().equals("2") || getDpSchedulerType().equalsIgnoreCase("mirror")){
+ 			UserContext.current().setEventDetails("DR VSM");
+-		else if(getType().equals("3") || getType().equalsIgnoreCase("migrate"))
++		}
++		else if (getDpSchedulerType().equals("3") || getDpSchedulerType().equalsIgnoreCase("migrate")){
+ 			UserContext.current().setEventDetails("Migrant VSM");
++		}
+ 		
+     	try{
+-    		DPScheduler result = _backupManagerService.addRemoteSchedule(this);
++			
++			QoSGroupBean qosBean = new QoSGroupBean();
++			populateQOSBean(qosBean);
++			DataProtectionBean dpBean = new DataProtectionBean();
++			populateDPBean(dpBean);
++		
++			QosGroup qosGroup = _qosGroupManagerService.addQosGroup(qosBean);
++			/*
++			 * Set the id & name
++			 */
++			qosBean.qosId(qosGroup.getId()).qosGrpName(qosGroup.getName());
++		
++			_qosGroupManagerService.addQosGroupOnController(qosBean);
++			
++			/*
++			 * Set the id & name
++			 */		
++			dpBean.backupQoSGroupId(qosGroup.getId()).backupQosGroupName(
++					qosGroup.getName());
++			
++			DPScheduler result = _drManagerService.addRemoteSchedule(dpBean);
++			
+             if (result != null) {
+-            	RemoteScheduleResponse response = _responseGenerator.createRemoteDPSchedulerResponse(result,"addRemoteScheduler");
++				RemoteScheduleResponse response = _responseGenerator
++						.createRemoteDPSchedulerResponse(result,
++								"addRemoteScheduler");
+                response.setResponseName(getCommandName());
+                this.setResponseObject(response);
+             } else {
+-               throw new ServerApiException(BaseCmd.INTERNAL_ERROR, "Failed to add Remote DP-Scheduler");
++				throw new ServerApiException(BaseCmd.INTERNAL_ERROR,
++						"Failed to add Remote DP-Scheduler");
+             }
++			
++		} catch (Exception e) {
++			e.printStackTrace();
++			throw new ServerApiException(BaseCmd.INTERNAL_ERROR, e.toString());
+           } 
+-   	 	catch (Exception e) {
+-                    throw new ServerApiException(BaseCmd.INTERNAL_ERROR, e.getMessage());
+    	 	}      
++
++	private void populateDPBean(DataProtectionBean dpBean) {
++		
++		dpBean.backupMgmtId(this.bkpId);
++		dpBean.dayOfScheduler(this.day);
++		dpBean.weekOfScheduler(this.week);
++		dpBean.fromControllerId(this.fromControllerId);
++		dpBean.fromDatasetId(this.fromDatasetId);
++		dpBean.fromPoolId(this.fromPoolId);
++		dpBean.fromVSMId(this.fromTsmId);
++		dpBean.hourOfScheduler(this.hour);
++		dpBean.minuteOfScheduler(this.minute);
++		dpBean.monthOfScheduler(this.month);
++		dpBean.retentionCopies(null != this.retentioncopies ? this.retentioncopies : 0);
++		dpBean.schedulerName(this.name);
++		dpBean.schedulerPassword(this.password);
++		dpBean.schedulerStatus(this.status);
++		dpBean.schedulerType(this.type);
++		dpBean.schedulerUsername(this.username);
++		dpBean.toControllerId(this.toControllerId);
++		dpBean.toDatasetId(null != this.toDatasetId ? this.toDatasetId : 0);
++		dpBean.toPoolId(this.toPoolId);
++		dpBean.toVSMId(this.toTsmId);
+     }
+ 
++	private void populateQOSBean(QoSGroupBean qosBean) {
++		
++		qosBean.blockSize(this.blocksize);
++		qosBean.qosGrpName("BackupQOS_" + System.nanoTime() + "_");
++		qosBean.grace(this.graceAllowed);
++		qosBean.vsmId(this.fromTsmId);
++		qosBean.throughputControl(this.tpControl);
++		qosBean.throughput(this.throughput);
++		qosBean.qosType(QosGroupService.QOS_TYPE.BACKUP.str());
++		qosBean.qosParentDatasetId(this.qosParentDatasetId);
++		qosBean.networkSpeed(this.networkSpeed);
++		qosBean.memLimit(this.memLimit);
++		qosBean.latency(this.latency);
++		qosBean.iopsControl(this.iopscontrol);
++		qosBean.iops(this.iops);
++	}
++
+ 	@Override
+ 	public String getCommandName() {
+ 		return s_name;
+Index: api/src/com/cloudbyte/api/commands/DeleteRemoteDPSCmd.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/DeleteRemoteDPSCmd.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/DeleteRemoteDPSCmd.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/DeleteRemoteDPSCmd.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/api/commands/DeleteRemoteDPSCmd.java	(working copy)
+@@ -23,6 +23,7 @@
+ import com.cloud.api.response.SuccessResponse;
+ import com.cloud.user.DelegatedAdminType;
+ import com.cloudbyte.api.CloudByteApiConstants;
++import com.cloudbyte.api.beans.DataProtectionBean;
+ 
+ @Implementation(description="Deletes a remote dp-scheduler.", responseObject=SuccessResponse.class)
+ public class DeleteRemoteDPSCmd extends BaseCmd {
+@@ -63,7 +64,18 @@
+ 
+ 	@Override
+ 	public void execute() {
+-    	boolean result = _backupManagerService.deleteRemoteDPScheduler(this);
++		
++    	/*
++    	 * Delete the DP scheduler
++    	 */
++		DataProtectionBean dpBean = new DataProtectionBean();
++		/*
++		 * set id & type
++		 */
++		dpBean.schedulerId(this.id).schedulerType(this.type);
++		
++		boolean result = _drManagerService.deleteRemoteDPScheduler(dpBean);
++    	
+         if (result) {
+         	s_logger.info("The result of deleting a remote scheduler : "+result);
+             SuccessResponse response = new SuccessResponse(getCommandName());
+@@ -71,6 +83,11 @@
+         } else {
+             throw new ServerApiException(BaseCmd.INTERNAL_ERROR, "Failed to delete Remote DP-Scheduler");
+         }
++        
++        /*
++         * Delete the Backup/Backend QOS that was set for this DR
++         */
++        
+     }
+ 
+ 	@Override
+Index: api/src/com/cloudbyte/managers/BackupService.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/BackupService.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/BackupService.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/BackupService.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/BackupService.java	(working copy)
+@@ -40,5 +40,4 @@
+ 
+ 	void createTSMOnController(long tsmId, long controllerId, String nodeId, boolean migrate);
+ 
+-
+ }
+Index: api/src/com/cloudbyte/managers/QosGroupService.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/QosGroupService.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/QosGroupService.java
+--- a/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/QosGroupService.java	(revision 7266)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/QosGroupService.java	(working copy)
+@@ -2,14 +2,13 @@
+ 
+ 
+ import java.util.List;
+-import java.util.Map;
+ 
++import com.cloudbyte.api.beans.QoSGroupBean;
+ import com.cloudbyte.api.commands.AddQosGroupCmd;
+ import com.cloudbyte.api.commands.DeleteQosGroupCmd;
+ import com.cloudbyte.api.commands.UpdateQosGroupCmd;
+-import com.cloudbyte.controller.Controller;
+ import com.cloudbyte.tsm.QosGroup;
+-// this interface contains cloudbyte api's to create a storage volume on a TSM 
++ 
+ public interface QosGroupService {
+ 
+ 	 public enum Components{
+@@ -36,13 +35,24 @@
+ 	    	NFSCIFS,
+ 	    }
+ 	
++	public enum QOS_TYPE {
++		ACCESS("1"), BACKUP("2");
+ 	 
++		private String value;
++
++		private QOS_TYPE(String value) {
++			this.value = value;
++		}
++
++		public String str() {
++			return value;
++		}
++	}
++	 
+ 	 QosGroup configureQosGroup(AddQosGroupCmd Cmd );
+ 	
+-
+ 	 Boolean updateControllerQos(Long qosgrpId);
+ 
+-
+ 	List<QosGroup> editQosGroup(UpdateQosGroupCmd cmd);
+ 
+ 	boolean deleteQosgroup(DeleteQosGroupCmd cmd);
+@@ -49,7 +59,12 @@
+ 	
+ 	boolean deleteQosgroup(long groupid, boolean forceDelete, String poolName,int size);
+ 
+-
+ 	Boolean rollbackQosGroupFromDB(QosGroup qos);
+ 
++	QosGroup addQosGroup(QoSGroupBean qosGrpBean);
++
++	boolean addQosGroupOnController(QoSGroupBean qosGrpBean);
++
++	boolean deleteQosgroup(QoSGroupBean qosGrpBean);
++
+ }
+Index: api/src/com/cloudbyte/managers/StorageService.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/StorageService.java b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/StorageService.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/api/src/com/cloudbyte/managers/StorageService.java	(working copy)
+@@ -0,0 +1,33 @@
++package com.cloudbyte.managers;
++
++public interface StorageService {
++
++	/**
++	 * These represent various storage related operations.
++	 * 
++	 * TODO Might want to move the enums to BaseManager or move all the enums
++	 * from BaseManager to here. Discuss !!
++	 * 
++	 * @author amit.das
++	 * 
++	 */
++	public enum Operation{
++		VERIFY_LICENSE("VERIFY_LICENSE"),
++		VERIFY_CONTROLLER("VERIFY_CONTROLLER"),
++		VERIFY_POOL("VERIFY_POOL"),
++		VERIFY_ACCOUNT("VERIFY_ACCOUNT"),
++		VERIFY_VSM("VERIFY_VSM"),
++		ROLLBACK_ADD_VOLUME("ADD_VOLUME");
++		
++		private String operationName;
++
++		private Operation(String operationName) {
++			this.operationName = operationName;
++		}
++		
++		public String str(){
++			return operationName;
++		}
++	}
++	
++}
+Index: server/src/com/cloud/cbc/mq/request/GroupQoS.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/GroupQoS.java b/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/GroupQoS.java
+--- a/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/GroupQoS.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/GroupQoS.java	(working copy)
+@@ -17,6 +17,7 @@
+     private String latency;
+     private String graceEnabled;
+ 	//private String networkspeed;
++	private String type;
+ 	
+ 	
+ 	public static GroupQoS createQOSGroup(QosGroup group,Tsm tsm, Pool pool){
+@@ -23,6 +24,8 @@
+ 		
+ 		GroupQoS grp_obj = new GroupQoS();
+ 		grp_obj.setName(group.getName());
++		grp_obj.setType(group.getType());
++		
+ 		//grp_obj.setIops(group.getIops());
+ 		grp_obj.setIops(String.valueOf((long)Math.floor((Long.valueOf(group.getIops()) * ((double)tsm.getQosDegradationPolicy()/100)))));
+ 		grp_obj.setMemLimit(group.getMemLimit());
+@@ -46,6 +49,10 @@
+ 	
+ 
+ 
++	
++
++
++
+ public static GroupQoS editQOSGroup(QosGroup group,Tsm tsm, Pool pool){
+ 		
+ 		GroupQoS grp_obj1 = new GroupQoS();
+@@ -70,6 +77,14 @@
+ 		
+ 	}
+ 
++	public void setType(String type) {
++		this.type = type;
++	}
++
++	public String getType() {
++		return type;
++	}
++	
+ 	private void setLatency(String latency) {
+ 		this.latency =latency;
+ 	   }	
+Index: server/src/com/cloud/cbc/mq/request/RemoteDPScheduler.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/RemoteDPScheduler.java b/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/RemoteDPScheduler.java
+--- a/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/RemoteDPScheduler.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloud/cbc/mq/request/RemoteDPScheduler.java	(working copy)
+@@ -22,6 +22,7 @@
+ 	private Long remoteretention;
+ 	private String username;
+ 	private String password;
++	private String backupqosgroupname;
+ 	
+ 	public void setTntUuid(String tntUuid) {
+ 		this.tntuuid= tntUuid;
+@@ -74,6 +75,11 @@
+ 	public void setPassword(String password) {
+ 		this.password = password;
+ 	}
++	
++	public void setBackupQosGroupName(String backupQosGroupName) {
++		this.backupqosgroupname = backupQosGroupName;
++	}
++	
+ 	public static RemoteDPScheduler createRemoteDPScheduler(DPSchedulerVO remoteDPScheduler,Map<String,String> remData,String tntUuid,String dsname) {
+ 		
+ 		RemoteDPScheduler scheduler = new RemoteDPScheduler();
+@@ -104,12 +110,10 @@
+ 		scheduler.setRemoteretention(remoteDPScheduler.getRetentionCopies());
+ 		scheduler.setUsername((String)remData.get("username"));
+ 		scheduler.setPassword((String)remData.get("password"));
++		scheduler.setBackupQosGroupName(remoteDPScheduler.getBackupQosGroupName());
+ 		
+-		
+ 		return scheduler;
+ 		
+-		
+ 	}
+ 	
+-
+ }
+Index: server/src/com/cloud/configuration/DefaultComponentLibrary.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloud/configuration/DefaultComponentLibrary.java b/branches/es1.4.0.p5/server/src/com/cloud/configuration/DefaultComponentLibrary.java
+--- a/branches/es1.4.0.p5/server/src/com/cloud/configuration/DefaultComponentLibrary.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloud/configuration/DefaultComponentLibrary.java	(working copy)
+@@ -79,6 +79,8 @@
+ import com.cloudbyte.localdpscheduler.dao.LocalDPSchedulerDaoImpl;
+ import com.cloudbyte.managers.BackupManagerImpl;
+ import com.cloudbyte.managers.CIFSServiceManagerImpl;
++import com.cloudbyte.managers.DRService;
++import com.cloudbyte.managers.DRServiceManagerImpl;
+ import com.cloudbyte.managers.FCServiceManagerImpl;
+ import com.cloudbyte.managers.ISCSIServiceManagerImpl;
+ import com.cloudbyte.managers.LdapServiceManagerImpl;
+@@ -370,7 +372,7 @@
+          addManager("BackupManager",BackupManagerImpl.class);
+         addManager("MigrationManager", MigrationMangerImpl.class) ;
+         addManager("LdapServiceManager", LdapServiceManagerImpl.class) ;
+-        addManager("MigrationManager", MigrationMangerImpl.class) ;
++        addManager("DRServiceManager", DRServiceManagerImpl.class) ;
+ 
+     }
+ 
+Index: server/src/com/cloudbyte/dpscheduler/DPSchedulerVO.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/dpscheduler/DPSchedulerVO.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/dpscheduler/DPSchedulerVO.java
+--- a/branches/es1.4.0.p5/server/src/com/cloudbyte/dpscheduler/DPSchedulerVO.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloudbyte/dpscheduler/DPSchedulerVO.java	(working copy)
+@@ -52,7 +52,7 @@
+ 	private long toTsmId;
+ 	
+ 	@Column(name="backup_qos_group_id")
+-	private Long backupQosGroupId;
++	private long backupQosGroupId;
+ 	
+ 	@Column(name="to_dts_id")
+ 	private long toDtsId;
+@@ -123,7 +123,11 @@
+     private String toPoolName;
+ 	@Transient
+     private String toControllerName;
++	@Transient
++	private String backupQosGroupName;
+ 	
++	
++
+ 	public DPSchedulerVO(){
+     	
+     }
+@@ -152,7 +156,11 @@
+     	this.status = status;
+     	this.type = type;
+     	this.retentionCopies = copies;
++    	if(null == backupQosGroupId){
++    		this.backupQosGroupId = 0;
++    	}else{
+     	this.backupQosGroupId = backupQosGroupId;
++    	}    	    	
+     	this.revisionNumber = 0;
+     	this.configState = "NOT_GIVEN";
+ 		
+@@ -509,5 +517,11 @@
+  	    return removed;
+  	}
+ 	
++	public String getBackupQosGroupName() {
++		return backupQosGroupName;
++	}
+ 	
++	public void setBackupQosGroupName(String backupQosGroupName) {
++		this.backupQosGroupName = backupQosGroupName;
++	}
+ }
+\ No newline at end of file
+Index: server/src/com/cloudbyte/managers/BackupManagerImpl.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BackupManagerImpl.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BackupManagerImpl.java
+--- a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BackupManagerImpl.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BackupManagerImpl.java	(working copy)
+@@ -73,6 +73,7 @@
+ import com.cloudbyte.alert.CloudByteAlertConstants;
+ import com.cloudbyte.alert.CloudByteAlertTypeConfig;
+ import com.cloudbyte.alert.DevmanAlertArgs;
++import com.cloudbyte.api.beans.DataProtectionBean;
+ import com.cloudbyte.api.commands.ActivateTSMCmd;
+ import com.cloudbyte.api.commands.AddLocalDPSchedulerCmd;
+ import com.cloudbyte.api.commands.AddRemoteScheduleCmd;
+@@ -243,7 +244,6 @@
+ 		}
+ 	}
+ 	
+-	
+ 	class CheckDrTsmDisableStatusTask extends TimerTask {
+ 		
+ 		long fromTsmId;
+@@ -2594,9 +2594,16 @@
+ 
+ 	/////////////// Add Remote Schedule //////////////////////
+ 
++	
++	
++
++	/**
++	 * Try using the DRManagerImpl's methods instead
++	 */
+ 	@Override
+ 	@DB
+ 	@ActionEvent(eventType = EventTypes.EVENT_REMOTE_DPS_CREATE, eventDescription = "creating a remote DP scheduler", async = false)
++	@Deprecated
+ 	public DPScheduler addRemoteSchedule(AddRemoteScheduleCmd cmd) {
+ 
+ 		Long fromTsmId = cmd.getFromTsmId();
+@@ -2608,8 +2615,8 @@
+ 		Long toPoolId = cmd.getToPoolId();
+ 		Long toControllerId = cmd.getToControllerId();
+ 		Long bkpId = cmd.getBkpId();
+-		String name = cmd.getName();
+-		String type = cmd.getType();
++		String name = cmd.getDPSchedulerName();
++		String type = cmd.getDpSchedulerType();
+ 		String password = cmd.getPassword();
+ 		String username = cmd.getUsername();
+ 		String month = cmd.getMonth();
+@@ -2620,8 +2627,8 @@
+ 		String cronSchedule = null;
+ 		String status = cmd.getStatus();
+ 		Long copies = cmd.getRetentionCopies();
+-		Long backupQosGroupId = cmd.getBackupQosGroupId();
+ 
++
+ 		if (username == null){
+ 			username = _bkpMgr.findById(bkpId).getIpAddress().replace('.', '_');
+ 		}
+@@ -2660,7 +2667,7 @@
+ 
+ 		TsmVO tsm=_tsmDao.findById(fromTsmId);
+ 		if(tsm!=null){
+-			UserContext.current().setEventParameters(" TSM Id:"+fromTsmId);
++			UserContext.current().appendEventParameters(" TSM Id:"+fromTsmId);
+ 			UserContext.current().appendEventParameters(", Account Id:"+tsm.getAcntId());
+ 			UserContext.current().appendEventParameters(", HAPool Id:"+fromPoolId);
+ 			UserContext.current().appendEventParameters(", Controller Id:"+fromControllerId);
+@@ -2673,7 +2680,7 @@
+ 		}
+ 
+ 		return addRemoteDPScheduler(fromTsmId, fromDtsId, fromPoolId, fromControllerId, toTsmId, toDtsId,
+-				toPoolId, toControllerId, bkpId, name, username, password, month, week, day, hour, minute, status, type, copies, backupQosGroupId);
++				toPoolId, toControllerId, bkpId, name, username, password, month, week, day, hour, minute, status, type, copies, null, null);
+ 	}
+ 
+ 	public void checkRemoteDPSchedulerParameters(Long fromTsmId, Long fromDtsId, Long fromPoolId,
+@@ -2680,6 +2687,7 @@
+ 			Long fromControllerId, Long toTsmId, Long toDtsId, Long toPoolId, Long toControllerId,
+ 			Long bkpId, String name, String month, String week, String day, String hour, 
+ 			String minute, String status, Long copies, String type){
++		
+ 		if(_bkpMgr.findById(bkpId) == null)
+ 		{
+ 			throw new InvalidParameterValueException("Invalid Backup Management IP");
+@@ -2707,10 +2715,14 @@
+ 	}
+ 
+ 
++	/**
++	 * This method will not be required if recent addRemoteSchedule is used.
++	 */
++	@Deprecated
+ 	private DPSchedulerVO addRemoteDPScheduler(Long fromTsmId, Long fromDtsId, Long fromPoolId,
+ 			Long fromControllerId, Long toTsmId, Long toDtsId, Long toPoolId, Long toControllerId,
+ 			Long bkpId, String name, String username, String password, String month, String week, 
+-			String day,	String hour, String minute, String status, String type, Long copies, Long backupQosGroupId)
++			String day,	String hour, String minute, String status, String type, Long copies, Long backupQosGroupId, String backupQosGroupName)
+ 	{
+ 		if(null == toDtsId)
+ 		{
+@@ -2774,6 +2786,12 @@
+ 			remoteDPScheduler = _remoteDPSchedulerDao.persist(remoteDPScheduler);
+ 
+ 			txn.commit();
++			
++			/*
++			 * Set the transient property here i.e. after persisting the VO. 
++			 */
++			remoteDPScheduler.setBackupQosGroupName(backupQosGroupName);
++			
+ 			ControllerResource resource = createControllerResource(fromControllerId);
+ 			ControllerResource resourceDestn = createControllerResource(toControllerId);
+ 
+@@ -3603,10 +3621,14 @@
+ 	///////// Start of Delete Remote DP Schedule ////////
+ 
+ 	/***			REMOTE DP SCHEDULER			***/
+-	//Deleting a remote dp-scheduler
++	
++	/**
++	 * Use recent version available in DRServiceManagerImpl.
++	 */
+ 	@Override
+ 	@DB
+ 	@ActionEvent(eventType = EventTypes.EVENT_REMOTE_DPS_DELETE, eventDescription = "deleting remote dp scheduler", async = false)
++	@Deprecated
+ 	public boolean deleteRemoteDPScheduler(DeleteRemoteDPSCmd cmd) {
+ 		Transaction txn = Transaction.currentTxn();	
+ 		/**delete the remote dp scheduler from the controller before removing from the database**/
+Index: server/src/com/cloudbyte/managers/BaseManager.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BaseManager.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BaseManager.java
+--- a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BaseManager.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/BaseManager.java	(working copy)
+@@ -124,6 +124,7 @@
+     	DELETE_FAILED("delete-failed"),
+     	DELETING("deleting"),
+     	DELETE("delete"),
++    	DELETE_INIT("delete-init"),
+     	DELETE_ABORTED("delete-aborted"),
+     	DISABLE_ABORTED("disable-aborted"),
+     	DISABLE_INIT("disable-init"),
+@@ -152,7 +153,11 @@
+     	ONLINE("online"),
+     	OFFLINE("offline"),
+     	ADDING("adding..."),
+-    	ABORTED("aborted");
++    	ABORTED("aborted"), 
++    	ENABLED("enabled"), 
++    	SUCCESS("success"), 
++    	DISABLED("disabled");
++    	
+     	private String value;
+ 
+     	Status(String value) {
+Index: server/src/com/cloudbyte/managers/MigrationMangerImpl.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/MigrationMangerImpl.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/MigrationMangerImpl.java
+Index: server/src/com/cloudbyte/managers/QosGroupManagerServiceImpl.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/QosGroupManagerServiceImpl.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/QosGroupManagerServiceImpl.java
+--- a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/QosGroupManagerServiceImpl.java	(revision 7266)
++++ b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/QosGroupManagerServiceImpl.java	(working copy)
+@@ -10,9 +10,12 @@
+ import java.util.Timer;
+ import java.util.TimerTask;
+ import java.util.UUID;
++
+ import javax.ejb.Local;
+ import javax.naming.ConfigurationException;
++
+ import org.apache.log4j.Logger;
++
+ import com.cloud.api.LicenseManager;
+ import com.cloud.cbc.mq.request.ListQosGroupRequest;
+ import com.cloud.cbc.mq.request.QOSGroupCreationRequest;
+@@ -39,6 +42,7 @@
+ import com.cloud.utils.qal.BaseResponse;
+ import com.cloudbyte.account.AccountVO2;
+ import com.cloudbyte.account.dao.AccountDao2;
++import com.cloudbyte.api.beans.QoSGroupBean;
+ import com.cloudbyte.api.commands.AddQosGroupCmd;
+ import com.cloudbyte.api.commands.DeleteQosGroupCmd;
+ import com.cloudbyte.api.commands.UpdateQosGroupCmd;
+@@ -99,9 +103,14 @@
+ 	long INITIAL_QOSGROUP_STATUS_CHECK_DELAY = 1L * 60L * 1000L; // 1min
+ 	Map<Long, Timer> _timerMap;
+ 
++	/**
++	 * Try using the recent overloaded method instead.
++	 * 
++	 */
+ 	@Override
+ 	@DB
+ 	@ActionEvent(eventType = EventTypes.EVENT_QOS_GROUP_CREATE, eventDescription = "Creating QoS_Group", async = false)
++	@Deprecated
+ 	public QosGroup configureQosGroup(AddQosGroupCmd Cmd) {
+ 
+ 		Transaction txnconfiguredevman = Transaction.currentTxn();
+@@ -133,6 +142,281 @@
+ 
+ 	}
+ 
++	/**
++	 * This method is a new way of exposing service methods by accepting plain
++	 * beans. This has been done as *CMD classes are:
++	 * 
++	 * - Expensive (tightly coupled to library & hence JVM startup)
++	 * 
++	 * - Tightly couples the SERVICE Layer with REST layer forcing a 1:1 mapping
++	 * 
++	 * - Does not cater to various requirements e.g Single API expected by the
++	 * REST clients.
++	 * 
++	 * In addition, this will pave the way for TASK based execution & rollback
++	 * design.
++	 * 
++	 * @author amit.das
++	 */
++	@Override
++	@ActionEvent(eventType = EventTypes.EVENT_QOS_GROUP_CREATE, eventDescription = "Creating QoS_Group", async = false)
++	public QosGroup addQosGroup(QoSGroupBean qosGrpBean) {
++		
++		/*
++		 * TODO Amit.D Move the verifications to generic manager e.g. {BaseManager}.
++		 * They will be called at first when we move to TASK based flow 
++		 */
++		boolean verifyECUuidWithLicense=LicenseManager.getInstance().checkSerialUuid();
++		if( !verifyECUuidWithLicense ) {
++			throw new PermissionDeniedException(LogMessages.WARN_LICENSE_DEVMAN_UUID_MISMATCH);
++		}
++		
++		long remaingdays = LicenseManager.getInstance().getRemainingDays();
++
++		if (remaingdays <= 0) {
++			throw new PermissionDeniedException(
++					"Permission Denied. Please take a new license.Your's license was expired");
++
++		}
++
++		Long tsmId = qosGrpBean.getVSMId();
++		String name = qosGrpBean.getQoSGrpName();
++		String iops = qosGrpBean.getIops();
++		String throughput = qosGrpBean.getThroughput();
++		String blockSize = qosGrpBean.getBlocksize();
++		String networkSpeed = qosGrpBean.getNetworkSpeed();
++		String latency = qosGrpBean.getLatency();
++		String memLimit = qosGrpBean.getMemLimit();
++		String type = qosGrpBean.getQoSType();
++		String iopscontrol = qosGrpBean.getIopsControl();
++		String tpControl = qosGrpBean.getThroughputControl();
++		boolean graceAllowed = qosGrpBean.getGrace();
++		long poolId = 0;
++		long poolLatency = 0;
++		long poolAvailableIOPS = 0;
++		long poolAvailableTput = 0;
++		
++		UserContext.current().appendEventDetails(", IOPS:" + iops);
++		UserContext.current().appendEventDetails(", Throughput:" + throughput);
++		UserContext.current().appendEventDetails(", Latency:" + latency);
++
++		String calculatedIops = "0";
++		String calculatedTput = "0";
++
++		
++		
++		// restricting to create storage when controller is down
++		TsmVO tsm = _tsmDao.findById(tsmId);
++		if (tsm != null) {
++			poolId = tsm.getPoolId();
++
++			PoolVO pool = _poolDao.findById(poolId);
++			if (pool != null) {
++				Long controllerId = pool.getControllerId();
++				long primaryControllerId = pool.getControllerId();
++				String primControllerName = null;
++				String secControllerName = null;
++
++				List<PoolProvisionVO> listpoolprovision = _poolProvisionDao
++						.listByPoolId(poolId);
++				if (listpoolprovision != null) {
++					for (PoolProvision ppo : listpoolprovision) {
++						if (ppo.getProvisionOrder() == 1) {
++							primaryControllerId = ppo.getControllerId();
++						}
++					}
++				}
++				ControllerVO primCont = _controllerDao
++						.findById(primaryControllerId);
++				if (primCont != null) {
++					primControllerName = primCont.getName();
++					// restricting to create storage when controller is down
++					// (when single node in cluster)
++					HAClusterVO clust = _haClusterDao.findById(primCont
++							.getClusterId());
++					if (clust.getNodeCount() == 1) {
++						if (primCont.getManagedState().equalsIgnoreCase(
++								"Maintenance")) {
++							throw new CloudRuntimeException(
++									"Not able to create QoSGroup(" + name
++											+ ") because Node("
++											+ primControllerName
++											+ ") is in Maintenance mode .");
++
++						}
++					}
++				}
++
++				ControllerVO secCont = _controllerDao.findById(controllerId);
++				if (secCont != null) {
++					secControllerName = secCont.getName();
++				}
++
++				PoolProvisionVO poolprovision = _poolProvisionDao
++						.findByPoolAndControllerId(poolId, controllerId);
++				if (poolprovision != null) {
++					long order = poolprovision.getProvisionOrder();
++					if (order != 1) {
++						throw new CloudRuntimeException(
++								"Not able to create QoSGroup("
++										+ name
++										+ ") because primary node("
++										+ primControllerName
++										+ ") of that pool is down,current pool:"
++										+ pool.getName()
++										+ " is provisioned to secondary node("
++										+ secControllerName + ")");
++					}
++				}
++				
++				poolLatency = pool.getPoolLatency();
++				poolAvailableIOPS = pool.getPoolAvailIops();
++				poolAvailableTput = pool.getPoolAvailTput();
++				
++			}
++
++		}
++		// validating latency 
++		Long tsmLatency = Long.parseLong(tsm.getLatency());
++		
++		if (QOS_TYPE.BACKUP.str().equals(qosGrpBean.getQoSType())
++				&& Long.valueOf(latency) < poolLatency) {
++			throw new InvalidParameterValueException(
++					"Latency should be greater than or equal to the POOL's latency "
++							+ poolLatency);
++		} else if (QOS_TYPE.ACCESS.str().equals(qosGrpBean.getQoSType())
++				&& Long.valueOf(latency) < tsmLatency) {
++			throw new InvalidParameterValueException(
++					"Latency should be greater than or equal to the VSM's latency "
++							+ tsmLatency);
++		}
++		
++		// before adding Qos group, validating iops and throughput with Tsm
++		Long tsmAvailIOPS = Long.parseLong(tsm.getAvailIops());
++		Long tsmAvailThroughput = Long.parseLong(tsm.getAvailThroughput());
++		// throughput = String.valueOf(Long.valueOf(throughput));// *1024);
++		s_logger.info("iops: " + iops);
++		s_logger.info("given throughput: " + throughput);
++		s_logger.info("given blocksize: " + blockSize);
++		s_logger.info("tsmAvailIOPS: " + tsmAvailIOPS);
++		s_logger.info("tsmAvailThroughput: " + tsmAvailThroughput);
++
++		// Calculate iops or throughput based upon the user input
++		// If only throughput is provided :- calculate iops
++		// If only iops is provided :- do not calculate throughput
++		// If both are not given throw an exception :- validation check in
++		// javascript(UI) and in java layer also(considering API calls)
++		if (iopscontrol.equalsIgnoreCase("true")
++				&& tpControl.equalsIgnoreCase("true")) {
++			throw new InvalidParameterValueException(
++					"[IOPS] : Both IOPS and Throughput cannot be controlled");
++		} else if (iopscontrol.equalsIgnoreCase("false")
++				&& tpControl.equalsIgnoreCase("false")) {
++			throw new InvalidParameterValueException(
++					"[IOPS] :  Both IOPS and Throughput cannot be uncontrolled");
++		} else if (iopscontrol.equalsIgnoreCase("true")) {
++			if (iops == null) {
++				throw new InvalidParameterValueException(
++						"[IOPS] : Specify IOPS");
++
++			}
++			if (Long.parseLong(throughput) != 0) {
++				throw new InvalidParameterValueException(
++						"[IOPS] : Throughout should be zero if the volume is controlled by IOPS");
++			}
++			calculatedIops = iops;
++			calculatedTput = String
++					.valueOf(Long.valueOf(iops)
++							* Long.valueOf(_configDao
++									.getValue("qos.penalty.blocksize")));
++			/*
++			 * Check against POOL or VSM
++			 */
++			if (QOS_TYPE.BACKUP.str().equals(qosGrpBean.getQoSType())
++					&& Long.valueOf(iops) > poolAvailableIOPS) {
++				
++				throw new InvalidParameterValueException(
++						"[IOPS] : Iops value should not exceed POOL's available IOPS: "
++								+ poolAvailableIOPS);
++				
++			} else if (QOS_TYPE.ACCESS.str().equals(qosGrpBean.getQoSType())
++					&& Long.valueOf(iops) > tsmAvailIOPS) {
++				
++				throw new InvalidParameterValueException(
++						"[IOPS] : Iops value should not exceed VSM's available IOPS: "
++								+ tsmAvailIOPS);
++			}
++			
++		} else if (tpControl.equalsIgnoreCase("true")) {
++
++			if (throughput == null) {
++				throw new InvalidParameterValueException(
++						"[IOPS] : Specify throughput");
++
++			}
++			
++			if (Long.parseLong(iops) != 0) {
++				throw new InvalidParameterValueException(
++						"[IOPS] : IOPS should be zero if the volume is controlled by Throughput");
++			}
++
++			calculatedTput = throughput;
++			calculatedIops = String
++					.valueOf(Long.valueOf(throughput)
++							/ Long.valueOf(_configDao
++									.getValue("qos.penalty.blocksize")));
++			
++			/*
++			 * Check against POOL or VSM
++			 */
++			if (QOS_TYPE.BACKUP.str().equals(qosGrpBean.getQoSType())
++					&& Long.valueOf(throughput) > poolAvailableTput) {
++			
++				throw new InvalidParameterValueException(
++						"[Throughput] : Throughput value should not exceed POOL's available throughput: "
++								+ poolAvailableTput / 1024);
++				
++			} else if (QOS_TYPE.ACCESS.str().equals(qosGrpBean.getQoSType())
++					&& Long.valueOf(throughput) > tsmAvailThroughput) {
++				
++				throw new InvalidParameterValueException(
++						"[Throughput] : Throughput value should not exceed VSM's available throughput: "
++								+ tsmAvailThroughput / 1024);
++			}
++			
++		}
++
++		// validate block size
++		if (blockSize != null) {
++			String[] temp;
++			try {
++				temp = blockSize.split("k");
++			} catch (Exception e) {
++				throw new InvalidParameterValueException(
++						"Invalid blocksize format, k must be small case");
++			}
++			int blksize = Integer.valueOf(temp[0]);
++
++			// bit opertion to check if its a power of 2 or not
++			if ((blksize > 0) && ((blksize & (blksize - 1)) == 0)) {
++				s_logger.info("validated blocksize: " + blockSize);
++			} else {
++				throw new InvalidParameterValueException(
++						"given Blocksize value is invalid: " + blockSize
++								+ " it should be a power of 2");
++			}
++		}
++
++		return addQosGroup(tsmId, name, iopscontrol, iops, tsmAvailIOPS,
++				tpControl, throughput, blockSize, tsmAvailThroughput, latency,
++				networkSpeed, memLimit, type, graceAllowed, calculatedIops,
++				calculatedTput);
++	}
++	
++	/*
++	 * Try using the recent overloaded version instead.
++	 */
++	@Deprecated
+ 	@DB
+ 	public QosGroup addQosGroup(AddQosGroupCmd cmd) {
+ 
+@@ -377,9 +661,6 @@
+ 
+ 		checkQosGroupParameters(tsmId, name, iops, throughput, latency, networkSpeed, memLimit);
+ 
+-//		long computedTput = Long.valueOf(throughput);
+-
+-
+ 		try {
+ 
+ 			byte[] bytes = (name + System.currentTimeMillis()).getBytes();
+@@ -392,7 +673,7 @@
+ 				qosgroup.setIops("0");
+ 			else
+ 				qosgroup.setIops(iops);
+-			qosgroup.setConfigState("init");
++			qosgroup.setConfigState(ConfigState.INIT.toString());
+ 			qosgroup.setManagedState("Available");
+ 			if(throughput == null)
+ 				qosgroup.setThroughput("0");
+@@ -493,7 +774,119 @@
+ 
+ 	/****************************************************************************************************************************************************************/
+ 
++	/**
++	 * This method is a new way of exposing service methods by accepting plain
++	 * beans. This has been done as *CMD classes are:
++	 * 
++	 * - Expensive (tightly coupled to library & hence JVM startup)
++	 * 
++	 * - Tightly couples the SERVICE Layer with REST layer forcing a 1:1 mapping
++	 * 
++	 * - Does not cater to various requirements e.g Single API expected by the
++	 * REST clients.
++	 * 
++	 * In addition, this will pave the way for TASK based execution & rollback
++	 * design.
++	 * 
++	 * @author amit.das
++	 */	
+ 	@Override
++	public boolean addQosGroupOnController(QoSGroupBean qosGrpBean) {
++
++		long revisionNumber = 0;
++		long controllerId = 0;
++		long vsmId;
++		long qosId = qosGrpBean.getQoSId();
++		Tsm vsm = null;
++		boolean isSuccess = false;
++		
++		QosGroupVO qosGroup = _qosGroupDao.findById(qosId);
++		/*
++		 * TODO amit.das
++		 * Move the validations to BaseManager. When we move to TASK based
++		 * flow, validations will be a set of TASKs.
++		 */
++		if (null == qosGroup) {
++			throw new InvalidParameterValueException("Unable to locate the qos group with id " + qosId);
++		}
++		
++		vsmId = qosGroup.getTsmId();
++		if (vsmId > 0) {
++			vsm = _tsmDao.findById(vsmId);
++			if (null != vsm) {
++				controllerId = vsm.getControllerId();
++				ControllerVO cont = _controllerDao.findById(controllerId);
++				UserContext.current().setEventParameters("Controller Id:" + cont.getId());
++			}
++		}
++
++		/*
++		 * TODO amit.das
++		 * Move the validations to BaseManager. When we move to TASK based
++		 * flow, validations will be a set of TASKs.
++		 */
++		if (revisionNumber > 0) {
++			
++			if (revisionNumber != qosGroup.getRevisionNumber()) {
++				throw new CloudRuntimeException("Failed to update QoSGroup. Invalid revision number.");
++			} else {
++				revisionNumber = revisionNumber + 1;
++			}
++			
++		} else {
++			revisionNumber = qosGroup.getRevisionNumber() + 1;
++		}
++		
++		PoolVO pool = _poolDao.findById(vsm.getPoolId());
++		ControllerResource resource = createControllerResource(controllerId);
++
++		String qosGrpCreationErrMsg = null;
++		QOSGroupCreationResponse response = null;
++
++		try {
++
++			response = (QOSGroupCreationResponse) resource.executeRequest(
++					QOSGroupCreationRequest.createRequest(
++							qosGroup, 
++							vsm, 
++							pool),
++					new QOSGroupCreationResponse());
++			
++		} catch (Exception ex) {
++			ex.printStackTrace();
++			qosGrpCreationErrMsg = ex.toString();			
++		}
++		
++		if (null != qosGrpCreationErrMsg || null == response
++				|| !"success".equalsIgnoreCase(response.getStatus())) {
++			/*
++			 * ERROR
++			 */
++			qosGrpCreationErrMsg = null != qosGrpCreationErrMsg ? qosGrpCreationErrMsg
++					: null != response ? response.getMappedErrorMsg()
++							: "No response from Controller";
++			
++			qosGroup.setConfigState(ConfigState.SYNC_FAILED.toString());
++			qosGroup.setStatus(Status.OFFLINE.toString());
++			_qosGroupDao.update(qosId, qosGroup);
++
++			throw new CloudRuntimeException(
++					"Failed to update QOS on node. " + qosGrpCreationErrMsg);
++
++		} else {
++			/*
++			 * SUCCESS
++			 */
++			qosGroup.setConfigState(ConfigState.SYNC.toString());
++			qosGroup.setStatus(Status.ONLINE.toString());
++			qosGroup.setRevisionNumber(revisionNumber);
++			isSuccess = _qosGroupDao.update(qosId, qosGroup);
++		}
++	
++		return isSuccess;
++	}
++	
++	@Override
+ 	public Boolean updateControllerQos(Long qosId) {
+ 
+ 		s_logger.info("Updating Node... ");
+@@ -1113,6 +1506,105 @@
+ 	}
+ 
+ 	/**
++	 * This method is a new way of exposing service methods by accepting plain
++	 * beans. This has been done as *CMD classes are:
++	 * 
++	 * - Expensive (tightly coupled to library & hence JVM startup)
++	 * 
++	 * - Tightly couples the SERVICE Layer with REST layer forcing a 1:1 mapping
++	 * 
++	 * - Does not cater to various requirements e.g Single API expected by the
++	 * REST clients.
++	 * 
++	 * In addition, this will pave the way for TASK based execution & rollback
++	 * design.
++	 * 
++	 * @author amit.das
++	 */
++	@Override	
++	@ActionEvent(eventType = EventTypes.EVENT_QOS_GROUP_DELETE, eventDescription = "deleting QoS group", async = false)
++	public boolean deleteQosgroup(QoSGroupBean qosGrpBean) {
++
++		/**
++		 * delete the QosGroup from the controller before removing from the
++		 * database
++		 **/
++		long qosId = qosGrpBean.getQoSId();
++		QosGroup qos = _qosGroupDao.findById(qosId);
++		String poolName = null;
++		if (null == qos) {
++			throw new InvalidParameterValueException("Unable to locate the qos with id " + qosId);
++		}
++		// creating the events
++		UserContext.current().setEventDetails("QoS Group Name" + qos.getName());
++		UserContext.current().setEventParameters(" QoS Group Id:" + qos.getId());
++		UserContext.current().appendEventParameters(" Tsm Id:" + qos.getTsmId());
++
++		long tsmId = qos.getTsmId();
++
++		TsmVO tsm = _tsmDao.findById(tsmId);
++		if (tsm != null) {
++			UserContext.current().appendEventParameters(" Controller Id:" + tsm.getControllerId());
++			UserContext.current().appendEventParameters(" HAPool Id:" + tsm.getPoolId());
++
++			// stoping the service when pool is provioned to another controller
++
++			PoolVO pool = _poolDao.findById(tsm.getPoolId());
++			Long poolId = null;
++			if (pool != null) {
++				poolName = pool.getName();
++				poolId = pool.getId();
++				Long controllerId = pool.getControllerId();
++				long primaryControllerId = pool.getControllerId();
++				String primControllerName = null;
++				String secControllerName = null;
++
++				List<PoolProvisionVO> listpoolprovision = _poolProvisionDao.listByPoolId(poolId);
++				if (listpoolprovision != null) {
++					for (PoolProvision ppo : listpoolprovision) {
++						if (ppo.getProvisionOrder() == 1) {
++							primaryControllerId = ppo.getControllerId();
++						}
++					}
++				}
++				ControllerVO primCont = _controllerDao.findById(primaryControllerId);
++				if (primCont != null) {
++					primControllerName = primCont.getName();
++				}
++
++				ControllerVO secCont = _controllerDao.findById(controllerId);
++				if (secCont != null) {
++					secControllerName = secCont.getName();
++				}
++
++				PoolProvisionVO poolprovision = _poolProvisionDao.findByPoolAndControllerId(poolId, controllerId);
++				if (poolprovision != null) {
++					long order = poolprovision.getProvisionOrder();
++					if (order != 1) {
++						throw new CloudRuntimeException("Not able to delete QoSGroup(" + qos.getName() + ") because primary node(" + primControllerName
++								+ ") of that pool is down,current pool:" + pool.getName() + " is provisioned to secondary node(" + secControllerName + ")");
++					}
++				}
++			}
++
++			AccountVO2 acc = _accountDao2.findById(tsm.getAcntId());
++			if (acc != null) {
++				UserContext.current().appendEventParameters(" Account Id:" + acc.getId());
++			}
++		}
++
++		List< DatasetVO> peerdatasets = _datasetDao.listByGroupId(qosId);
++        s_logger.info("Number of peer Storage Volumes sharing the same QoS  "+ ( peerdatasets.size() - 1 ) );
++        
++        if (peerdatasets.size() > 0) {
++			throw new CloudRuntimeException("cannot delete the Qos Group, there are "+ peerdatasets.size() + " volume asigned to this Qos Group");
++        }
++        
++		return deleteQosgroup(qosId, true, poolName,peerdatasets.size());
++
++	}
++	
++	/**
+ 	 * @see com.cloudbyte.managers.QosGroupService#deleteQosgroup(com.cloudbyte.api.commands.DeleteQosGroupCmd)
+ 	 */
+ 	@Override
+Index: server/src/com/cloudbyte/managers/StorageServiceManagerImpl.java
+===================================================================
+diff --git a/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/StorageServiceManagerImpl.java b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/StorageServiceManagerImpl.java
+new file mode 10644
+--- /dev/null	(revision 0)
++++ b/branches/es1.4.0.p5/server/src/com/cloudbyte/managers/StorageServiceManagerImpl.java	(working copy)
+@@ -0,0 +1,314 @@
++package com.cloudbyte.managers;
++
++import java.security.InvalidParameterException;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Map;
++
++import javax.ejb.Local;
++import javax.naming.ConfigurationException;
++
++import com.cloud.utils.component.Inject;
++import com.cloud.utils.component.Manager;
++import com.cloudbyte.api.beans.EntityBean;
++import com.cloudbyte.backupmanagement.dao.BackupManagementDao;
++import com.cloudbyte.dpscheduler.DPScheduler;
++import com.cloudbyte.dpscheduler.DPSchedulerVO;
++import com.cloudbyte.dpscheduler.dao.DPSchedulerDao;
++
++/**
++ * This manager class is expected to be a generic implementation for single API
++ * calls.
++ * 
++ * NOTE - A single API call is used to execute public methods of various
++ * ServiceManagerImpl classes. A generic execute is available to execute these
++ * operations serially. In-case of any failure the generic rollback can be
++ * invoked which in invokes various rollback operations serially.
++ * 
++ * NOTE - The caller to this manager will be the CMD classes. Building the
++ * forwards set of Operations or rollback set of operations lies with the
++ * respective CMD classes.
++ * 
++ * @author amit.das
++ * 
++ */
++/*@Local({StorageService.class })*/
++/*public class StorageServiceManagerImpl implements StorageService, Manager{*/
++public class StorageServiceManagerImpl implements StorageService{
++
++	@Inject
++	private VolumeService _volumeService;
++	
++	@Inject 
++	private BackupManagementDao _bkpMgr;
++	
++	@Inject 
++	private DPSchedulerDao _remoteDPSchedulerDao;
++		
++	/*@Override
++	public boolean configure(String name, Map<String, Object> params)
++			throws ConfigurationException {
++		return true;
++	}
++
++	@Override
++	public boolean start() {
++		return true;
++	}
++
++	@Override
++	public boolean stop() {
++		return true;
++	}
++
++	@Override
++	public String getName() {
++		return StorageServiceManagerImpl.class.getSimpleName();
++	}*/
++
++	/**
++	 * This method will execute the operations one-by-one. The order of
++	 * execution depends on the operation's STEP.
++	 * 
++	 * NOTE - This method will never be involved in rollback or handling
++	 * exceptions etc.
++	 * 
++	 * @param listOfOperations
++	 *            has the details of the operation
++	 * @param bean
++	 *            which will be passed to the operation callback methods
++	 * @return
++	 */
++	public boolean execute(List<OperationDetails> listOfOperations, EntityBean bean){
++		
++		int noOfOperations = listOfOperations.size();
++		OperationDetails operationDetail = null;
++		
++		for (int step = 1; step <= noOfOperations; step++){
++			
++			operationDetail = getOperation(step, listOfOperations);			
++			execute(operationDetail, bean);							
++			/*
++			 * In case of error, break out without further execution
++			 */
++			if(!operationDetail.hasCompleted || null != operationDetail.errMsg){
++				return false;				
++			}
++			
++		}
++		
++		return true;		
++	}
++
++	/**
++	 * This method will execute the rollback operations one-by-one. The order of
++	 * execution depends on the operation's STEP.
++	 * 
++	 * NOTE - CMD class should try to build new steps for rollback. The
++	 * operations used for execution should not be reused during rollback.
++	 * 
++	 * @param listOfOperations
++	 *            has the details of the operation
++	 * @param bean
++	 *            which will be passed to the operation callback methods
++	 * @return
++	 */
++	public boolean rollback(List<OperationDetails> listOfOperations, EntityBean bean){
++		int noOfOperations = listOfOperations.size();
++		OperationDetails operationDetail = null;
++		
++		for (int step = 1; step <= noOfOperations; step++){
++			
++			operationDetail = getOperation(step, listOfOperations);			
++			rollback(operationDetail, bean);			
++			/*
++			 * In case of error, break out without further rollback operations
++			 */
++			if(!operationDetail.hasCompleted || null != operationDetail.errMsg){
++				return false;				
++			}
++			
++		}
++		
++		return true;		
++	}
++	
++	/**
++	 * This class is a wrapper over
++	 * {com.cloudbyte.managers.StorageService.Operation}. Various properties of
++	 * this class enable smooth functioning of set of Operations execution &
++	 * rollback.
++	 * 
++	 * NOTE - An Operation is a mapping to a Task with a one-to-one
++	 * relationship.
++	 * 
++	 * @author amit.das
++	 * 
++	 */
++	private class OperationDetails{
++		/*
++		 * Step should start from 1 & then can increment.
++		 * The utility functions take care of this requirement.
++		 */
++		private int step; 
++		private Operation operation; 		
++		boolean hasStarted = false;
++		boolean hasCompleted = true; 
++		String errMsg = null;
++		
++	}
++	
++	public List<OperationDetails> createFirstOperation(Operation firstOperation){
++		OperationDetails operationDetails = new OperationDetails();
++		
++		operationDetails.step = 1;
++		operationDetails.operation = firstOperation;
++		
++		List<OperationDetails> listOfOperations = new ArrayList<OperationDetails>();
++		listOfOperations.add(1, operationDetails);
++		return listOfOperations;
++	}
++	
++	public void addNextOperation(List<OperationDetails> listOfOperations, Operation operation){
++		if (null == listOfOperations || 0 == listOfOperations.size()){
++			throw new InvalidParameterException("First operation is missing.");
++		}
++		
++		int newStep = listOfOperations.size() + 1;
++		
++		OperationDetails operationDetails = new OperationDetails();
++		operationDetails.operation = operation;		
++		operationDetails.step = newStep; 
++		
++		listOfOperations.add(newStep, operationDetails);
++	}
++	
++	/**
++	 * This method maps the enum Operation with corresponding FORWARD actions.
++	 *  
++	 * @param operationDetail
++	 * @param bean
++	 */
++	private void execute(OperationDetails operationDetail, EntityBean bean) {
++
++		/*
++		 * Below switch case should invoke public methods of appropriate
++		 * ServiceManagerImpl classes.
++		 */
++		switch (operationDetail.operation) {
++		case VERIFY_LICENSE:			
++			break;
++		case VERIFY_ACCOUNT:
++			break;
++		case VERIFY_CONTROLLER:
++			break;
++		case VERIFY_POOL:
++			break;
++		case VERIFY_VSM:
++			break;
++		default:
++			break;
++		}
++		
++		/*
++		 * Set the error or success against the operation
++		 */
++		if (null != bean.getErrMsg()){
++			setErrorOnOperation(operationDetail, bean.getErrMsg());
++		}else{
++			setSuccessOnOperation(operationDetail);
++		}
++
++	}
++	
++	/**
++	 * This method maps the enum Operation with corresponding ROLLBACK actions.
++	 * 
++	 * @param operationDetail
++	 * @param bean
++	 */
++	private void rollback(OperationDetails operationDetail, EntityBean bean) {
++		
++		/*
++		 * Below switch case should invoke public methods of appropriate
++		 * ServiceManagerImpl classes.
++		 */
++		switch (operationDetail.operation) {
++		case ROLLBACK_ADD_VOLUME:			
++			break;		
++		default:
++			break;
++		}
++		
++		/*
++		 * Set the error or success against the operation
++		 */
++		if (null != bean.getErrMsg()){
++			setErrorOnOperation(operationDetail, bean.getErrMsg());
++		}else{
++			setSuccessOnOperation(operationDetail);
++		}
++		
++	}
++	
++	private void setSuccessOnOperation(OperationDetails operation){
++		operation.hasStarted = true;
++		operation.hasCompleted = true;
++		operation.errMsg = null;
++	}
++	
++	private void setErrorOnOperation(OperationDetails operation, String errMsg){
++		operation.hasStarted = true;
++		operation.hasCompleted = false;
++		operation.errMsg = errMsg;
++	}
++	
++	private OperationDetails getOperation(int step, List<OperationDetails> listOfOperations) {
++		return listOfOperations.get(step);
++	}
++	
++	/**
++	 * TODO MOVE all the verification methods to BaseManager.
++	 * Discuss !!!
++	 * 
++	 * @param entityBean
++	 */
++	private void verifyLicense(EntityBean entityBean){
++		
++	}
++	
++	private void verifyBackupManagement(long bkpId, EntityBean entityBean){
++		
++		if(null == _bkpMgr.findById(bkpId))
++		{			
++			/*
++			 * Set the error s.t. caller classes can handle appropriately
++			 */
++			// VERIFY_BACKUP_MGMT_FAILED
++		}
++
++	}
++	
++	private void verifyDuplicateDPScheduler(long fromVsmId,
++			String schedulerName, String schedulerType, EntityBean entityBean) {
++		
++		List<DPSchedulerVO> listOfDPSchedulers = _remoteDPSchedulerDao
++				.listByFromTsmId(fromVsmId);
++
++		for (DPScheduler dpScheduler : listOfDPSchedulers) {
++
++			if (dpScheduler.getName().equalsIgnoreCase(schedulerName)
++					&& dpScheduler.getType().equalsIgnoreCase(schedulerType)) {
++
++				/*
++				 * Set the error s.t. caller classes can handle appropriately
++				 */
++				// VERIFY_DUPLICATE_DP_SCHEDULER_FAILED
++				break;
++			}
++
++		}
++
++	}
++	
++}
